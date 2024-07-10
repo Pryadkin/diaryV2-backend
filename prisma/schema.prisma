@@ -1,0 +1,70 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @default(cuid()) @id
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  email       String  @unique
+
+  firstName       String  @unique @map("first_name")
+  lastName       String  @unique @map("last_name")
+
+  password     String
+
+  games        Game[]
+
+  @@map("user")
+}
+
+model Game {
+  id          String   @default(cuid()) @id
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  name        String  @unique
+  description String
+  genres      Genre[]
+
+  user        User    @relation(fields: [userId], references: [id])
+  userId      String @map("user_id")
+
+  @@map("game")
+}
+
+enum Genre {
+  action
+  indie
+  adventure
+  rpg
+  strategy
+  shooter
+  casual
+  simulation
+  puzzle
+  arcade
+  platformer
+  racing
+  massivelyMultiplayer @map("massively_multiplayer")
+  sports
+  fighting
+  family
+  boardGames @map("board_games")
+  educational
+  card
+
+  @@map("genre")
+}

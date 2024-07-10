@@ -1,0 +1,13 @@
+version: '3.5'
+services:
+  myg_db:
+    container_name: 'myg_db'
+    image: postgres:14.3-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: root
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - '5440:5432'
