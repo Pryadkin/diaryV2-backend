@@ -17,9 +17,17 @@ async function bootstrap() {
 	})
 	app.use(cookieParser())
 
-	const config = new DocumentBuilder().setTitle('MYG').setVersion('1.0').build()
+	const config = new DocumentBuilder()
+		.setTitle('MYG')
+		.setVersion('1.0')
+		.addBearerAuth()
+		.build()
 	const document = SwaggerModule.createDocument(app, config)
-	SwaggerModule.setup('swagger', app, document)
+	SwaggerModule.setup('swagger', app, document, {
+		swaggerOptions: {
+			persistAuthorization: true, // добавили
+		},
+	})
 	await app.listen(4010)
 }
 bootstrap()
