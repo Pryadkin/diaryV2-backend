@@ -1,26 +1,40 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator'
+import {
+	IsEmail,
+	IsNumber,
+	IsOptional,
+	IsString,
+	Max,
+	Min,
+	MinLength,
+} from 'class-validator'
 
-export class UserGameDto {
-	name: string
+export class PomodoroSettingsDto {
+	@IsNumber()
+	@IsOptional()
+	@Min(1)
+	workInterval?: number
 	description: string
-	genres: any[]
+
+	@IsNumber()
+	@IsOptional()
+	@Min(1)
+	breakInterval?: number
+
+	@IsNumber()
+	@IsOptional()
+	@Min(1)
+	@Max(10)
+	intervalsCount?: number
 }
 
-export class UserDto extends UserGameDto {
+export class UserDto extends PomodoroSettingsDto {
 	@ApiProperty({
 		example: 'Anton',
 	})
 	@IsString()
 	@IsOptional()
-	firstName?: string
-
-	@ApiProperty({
-		example: 'Pryadkin',
-	})
-	@IsString()
-	@IsOptional()
-	lastName?: string
+	name?: string
 
 	@ApiProperty({
 		example: 'anton@yandex.ru',

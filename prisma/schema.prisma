@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,52 +13,97 @@ model User {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   email       String  @unique
-
-  firstName       String  @unique @map("first_name")
-  lastName       String  @unique @map("last_name")
-
+  name       String  @unique @map("name")
   password     String
 
-  games        Game[]
+  workInterval Int? @default(50) @map("work_interval")
+  breakInterval Int? @default(10) @map("break_interval")
+  intervalsCount Int? @default(7) @map("intervals_count")
+
+  posts Post[]
+  tasks Task[]
+  timeBlocks TimeBlock[]
+  pomodoroSession PomodoroSession[]
 
   @@map("user")
 }
 
-model Game {
+model Post {
   id          String   @default(cuid()) @id
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  name        String  @unique
-  description String
-  genres      Genre[]
+  name       String
+  content    String
 
-  user        User    @relation(fields: [userId], references: [id])
-  userId      String @map("user_id")
+  user       User @relation(fields: [userId], references: [id])
+  userId     String @map("user_id")
 
-  @@map("game")
+  @@map("post")
 }
 
-enum Genre {
-  action
-  indie
-  adventure
-  rpg
-  strategy
-  shooter
-  casual
-  simulation
-  puzzle
-  arcade
-  platformer
-  racing
-  massivelyMultiplayer @map("massively_multiplayer")
-  sports
-  fighting
-  family
-  boardGames @map("board_games")
-  educational
-  card
+model Task {
+  id          String   @default(cuid()) @id
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  @@map("genre")
+  name       String
+  priority   Priority?
+  isCompleted Boolean? @default(false) @map("is_completed")
+
+  user       User @relation(fields: [userId], references: [id])
+  userId     String @map("user_id")
+
+  @@map("task")
+}
+
+model TimeBlock {
+  id          String   @default(cuid()) @id
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  name        String
+  color       String
+  duration    Int
+  order       Int @default(1)
+
+  user       User @relation(fields: [userId], references: [id])
+  userId     String @map("user_id")
+
+  @@map("time_block")
+}
+
+model PomodoroSession {
+  id          String   @default(cuid()) @id
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  isCompleted Boolean? @default(false) @map("is_completed")
+
+  user       User @relation(fields: [userId], references: [id])
+  userId     String @map("user_id")
+
+  rounds PomodoroRound[]
+
+  @@map("pomodoro_session")
+}
+
+model PomodoroRound {
+  id          String   @default(cuid()) @id
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  totalSeconds Int @map("total_seconds")
+  isCompleted Boolean? @default(false) @map("is_completed")
+
+  session    PomodoroSession @relation(fields: [pomodoroSessionId], references: [id], onDelete: Cascade)
+  pomodoroSessionId     String @map("pomodoro_session_id")
+
+  @@map("pomodoro_round")
+}
+
+enum Priority {
+  low
+  medium
+  high
 }

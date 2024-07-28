@@ -4,6 +4,8 @@ import { AuthDto } from 'src/auth/dto/auth.dto'
 import { PrismaService } from 'src/prisma.service'
 import { UserDto } from './dto/user.dto'
 
+import { startOfDay, subDays } from 'date-fns'
+
 @Injectable()
 export class UserService {
 	constructor(private prisma: PrismaService) {}
@@ -12,7 +14,7 @@ export class UserService {
 		return this.prisma.user.findUnique({
 			where: { id },
 			include: {
-				games: true,
+				tasks: true,
 			},
 		})
 	}
@@ -25,17 +27,53 @@ export class UserService {
 
 	async getProfile(id: string) {
 		const profile = await this.getById(id)
+
+		const totalTasks = profile.tasks.length
+		const completedTask = await this.prisma.task.count({
+			where: {
+				userId: id,
+				isCompleted: true,
+			},
+		})
+
+		const todayStart = startOfDay(new Date())
+		const weekStart = startOfDay(subDays(new Date(), 7))
+
+		const todayTasks = await this.prisma.task.count({
+			where: {
+				userId: id,
+				createdAt: {
+					gte: todayStart.toISOString(),
+				},
+			},
+		})
+		const weekTasks = await this.prisma.task.count({
+			where: {
+				userId: id,
+				createdAt: {
+					gte: weekStart.toISOString(),
+				},
+			},
+		})
+
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { password, ...rest } = profile
 
-		return rest
+		return {
+			user: rest,
+			statistics: [
+				{ label: 'Total tasks', value: totalTasks },
+				{ label: 'Completed tasks', value: completedTask },
+				{ label: 'Today tasks', value: todayTasks },
+				{ label: 'Week tasks', value: weekTasks },
+			],
+		}
 	}
 
 	async create(dto: AuthDto) {
 		const user = {
 			email: dto.email,
-			firstName: dto.firstName,
-			lastName: dto.lastName,
+			name: dto.name,
 			password: await hash(dto.password),
 		}
 
@@ -55,9 +93,8 @@ export class UserService {
 			where: { id },
 			data,
 			select: {
+				name: true,
 				email: true,
-				firstName: true,
-				lastName: true,
 			},
 		})
 	}

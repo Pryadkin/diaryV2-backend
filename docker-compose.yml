@@ -1,7 +1,7 @@
 version: '3.5'
 services:
-  myg_db:
-    container_name: 'myg_db'
+  diary_db:
+    container_name: 'diary_db'
     image: postgres:14.3-alpine
     restart: always
     environment:
@@ -10,4 +10,4 @@ services:
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - '5440:5432'
+      - '5445:5432'

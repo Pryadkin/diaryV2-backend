@@ -13,14 +13,7 @@ export class AuthDto {
 	})
 	@IsString()
 	@IsNotEmpty()
-	firstName: string
-
-	@ApiProperty({
-		example: 'Pryadkin',
-	})
-	@IsString()
-	@IsNotEmpty()
-	lastName: string
+	name: string
 
 	@ApiProperty({
 		example: '123456',
