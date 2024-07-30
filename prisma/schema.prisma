@@ -63,7 +63,7 @@ model TimeBlock {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   name        String
-  color       String
+  color       String?
   duration    Int
   order       Int @default(1)
 
